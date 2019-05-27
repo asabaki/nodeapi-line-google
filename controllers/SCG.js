@@ -1,4 +1,5 @@
 const keys = require('../config/keys');
+const request = require('request')
 const googleMapsClient = require('@google/maps').createClient({
     key: keys.googleApi,
     Promise: Promise
@@ -66,6 +67,34 @@ exports.restaurant_find = async (req, res, next) => {
     });
 
 };
+
+exports.webhook = (req,res,next) => {
+    let reply_token = req.body.events[0].replyToken;
+    let msg = req.body.events[0].message.text;
+    reply(reply_token, msg);
+    res.sendStatus(200)
+};
+
+function reply(reply_token, msg) {
+    let headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer {xxxxxxx}'
+    };
+    let body = JSON.stringify({
+        replyToken: reply_token,
+        messages: [{
+            type: 'text',
+            text: msg
+        }]
+    });
+    request.post({
+        url: 'https://api.line.me/v2/bot/message/reply',
+        headers: headers,
+        body: body
+    }, (err, res, body) => {
+        console.log('status = ' + res.statusCode);
+    });
+}
 
 exports.echo = (req,res,next) => {
     Promise
