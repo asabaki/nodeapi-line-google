@@ -81,26 +81,50 @@ exports.replyNow = (req,res,next) => {
     const msg = req.body.events[0].message.text;
     console.log(token);
     console.log(msg);
-    client.reply(token, [{
-        type: 'text',
-        text: 'Hello yourself'
-    }, {
-        type: 'text',
-        text: 'Fucker'
-    }]);
+    // client.reply(token, [{
+    //     type: 'text',
+    //     text: 'Hello yourself'
+    // }, {
+    //     type: 'text',
+    //     text: 'Fucker'
+    // }]);
+    client.replyButtonTemplate(token, 'this is a template', {
+        thumbnailImageUrl: 'https://images.unsplash.com/photo-1558058739-d57e30ecea50?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=668&q=80',
+        title: 'Menu',
+        text: 'Please select',
+        actions: [
+            {
+                type: 'postback',
+                label: 'Buy',
+                data: 'action=buy&itemid=123',
+            },
+            {
+                type: 'postback',
+                label: 'Add to cart',
+                data: 'action=add&itemid=123',
+            },
+            {
+                type: 'uri',
+                label: 'View detail',
+                uri: 'http://example.com/page/123',
+            },
+        ],
+    });
+
+
     res.sendStatus(200);
 };
 
 
-exports.replyWithMid = (req,res,next) => {
-    const token = req.body.events[0].replyToken;
-    const msg = req.body.events[0].message.text;
-    console.log(token);
-    console.log(msg);
-    client_main.replyMessage(token, 'Hello Yourself, Bitch!!')
-        .then(() => {
-        console.log('Sending....');
-        res.statusCode(200);
-    })
-};
+// exports.replyWithMid = (req,res,next) => {
+//     const token = req.body.events[0].replyToken;
+//     const msg = req.body.events[0].message.text;
+//     console.log(token);
+//     console.log(msg);
+//     client_main.replyMessage(token, 'Hello Yourself, Bitch!!')
+//         .then(() => {
+//         console.log('Sending....');
+//         res.statusCode(200);
+//     })
+// };
 
