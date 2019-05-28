@@ -77,6 +77,7 @@ exports.restaurant_find = async (req, res, next) => {
 };
 
 exports.replyNow = (req,res,next) => {
+    console.log(req.body.events);
     const token = req.body.events[0].replyToken;
     const msg = req.body.events[0].message.text;
     console.log(token);
