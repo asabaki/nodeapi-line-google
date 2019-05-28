@@ -12,14 +12,13 @@ const config = {
 };
 const client_main = new line.Client(config);
 
-const { LineClient } = require('messaging-api-line');
+const {LineClient} = require('messaging-api-line');
 
 // get accessToken and channelSecret from LINE developers website
 const client = LineClient.connect({
     accessToken: keys.channelAccessToken,
     channelSecret: keys.channelSecret,
 });
-
 
 
 exports.SCG = (req, res, next) => {
@@ -37,7 +36,7 @@ exports.SCG = (req, res, next) => {
         }
     };
 
-    request(options, (err,response,body) => {
+    request(options, (err, response, body) => {
         res.json(JSON.parse(body));
     })
     // fetch(`https://api.stormglass.io/v1/weather/point?lat=${lat}&lng=${lng}&params=${params}`, {
@@ -85,7 +84,7 @@ exports.restaurant_find = async (req, res, next) => {
         address: 'Bang Sue'
     }, (err, result) => {
         const latLngObj = result.json.results[0].geometry.location;
-        const latLng = latLngObj['lat'] +','+ latLngObj['lng'];
+        const latLng = latLngObj['lat'] + ',' + latLngObj['lng'];
 
         // Assign Lat and Long and use them to find restaurant nearby
         googleMapsClient.placesNearby({
@@ -99,7 +98,7 @@ exports.restaurant_find = async (req, res, next) => {
 
 };
 
-exports.replyNow = (req,res,next) => {
+exports.replyNow = (req, res, next) => {
     console.log(req.body.events);
     const token = req.body.events[0].replyToken;
     const event = req.body.events[0];
@@ -141,12 +140,13 @@ exports.replyNow = (req,res,next) => {
             text: 'Humidity Forecast',
             actions: [
                 {
-                  type: 'location',
-                  label: 'Let\'s Forecast'
+                    type: 'location',
+                    label: 'Let\'s Forecast'
                 },
                 {
                     type: 'postback',
                     data: 'action=humid',
+                    abel: 'Let\'s Forecast'
                 },
 
 
