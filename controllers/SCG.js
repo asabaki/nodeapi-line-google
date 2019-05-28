@@ -153,65 +153,61 @@ exports.replyNow = (req, res, next) => {
                 const body_json = JSON.parse(body);
                 const climate = body_json.weather[0].main;
                 const temp = body_json.main.temp;
+
+
                 if (climate === 'Thunderstorm') {
-                    client.replyImage(token, {
-                        originalContentUrl: 'https://imgbbb.com/images/2019/05/28/thunder.jpg',
-                        previewImageUrl: 'https://imgbbb.com/images/2019/05/28/thunder.th.jpg'
-                    });
-                    client.reply(token, {
-                        type: 'text',
-                        text:`Whoa, It seems that there is a thunderstorm out there. The temperature right now is ${temp} °C`
-                    })
+                    client.reply(token, [
+                        line.createImage({
+                            originalContentUrl: 'https://imgbbb.com/images/2019/05/28/thunder.jpg',
+                            previewImageUrl: 'https://imgbbb.com/images/2019/05/28/thunder.th.jpg'
+                        }),
+                        line.createText(`\`Whoa, It seems that there is a thunderstorm out there. The temperature right now is ${temp} °C\``)
+                    ])
                 }
                 if (climate === 'Clouds') {
-                    client.replyImage(token, {
-                        originalContentUrl: 'https://imgbbb.com/images/2019/05/28/cloudy.jpg',
-                        previewImageUrl: 'https://imgbbb.com/images/2019/05/28/cloudy.th.jpg'
-                    });
-                    client.reply(token, {
-                        type: 'text',
-                        text:`Hmmm, Quite Cloudy today. The temperature right now is ${temp} °C`
-                    })
+                    client.reply(token, [
+                        line.createImage({
+                            originalContentUrl: 'https://imgbbb.com/images/2019/05/28/cloudy.jpg',
+                            previewImageUrl: 'https://imgbbb.com/images/2019/05/28/cloudy.th.jpg'
+                        }),
+                        line.createText(`Hmmm, Quite Cloudy today. The temperature right now is ${temp} °C`)
+                    ]);
                 }
                 if (climate === 'Drizzle') {
-                    client.replyImage(token, {
-                        originalContentUrl: 'https://imgbbb.com/images/2019/05/28/drizzle.jpg',
-                        previewImageUrl: 'https://imgbbb.com/images/2019/05/28/drizzle.th.jpg'
-                    });
-                    client.reply(token, {
-                        type: 'text',
-                        text:`Drizzling today huh? The temperature right now is ${temp} °C`
-                    })
+                    client.reply(token, [
+                        line.createImage({
+                            originalContentUrl: 'https://imgbbb.com/images/2019/05/28/drizzle.jpg',
+                            previewImageUrl: 'https://imgbbb.com/images/2019/05/28/drizzle.th.jpg'
+                        }),
+                        line.createText(`Drizzling today huh? The temperature right now is ${temp} °C`)
+                    ]);
                 }
                 if (climate === 'Rain') {
-                    client.replyImage(token, {
-                        originalContentUrl: 'https://imgbbb.com/images/2019/05/28/rain.jpg',
-                        previewImageUrl: 'https://imgbbb.com/images/2019/05/28/rain.th.jpg'
-                    });
-                    client.reply(token, {
-                        type: 'text',
-                        text:`Don\'t get wet today ain\'t you?. The temperature right now is ${temp} °C`
-                    })
+                    client.reply(token, [
+                        line.createImage({
+                            originalContentUrl: 'https://imgbbb.com/images/2019/05/28/rain.jpg',
+                            previewImageUrl: 'https://imgbbb.com/images/2019/05/28/rain.th.jpg'
+                        }),
+                        line.createText(`Don\'t get wet today ain\'t you?. The temperature right now is ${temp} °C`)
+                    ]);
                 }
                 if (climate === 'Snow') {
-                    client.replyImage(token, {
-                        originalContentUrl: 'https://imgbbb.com/images/2019/05/28/snow.jpg',
-                        previewImageUrl: 'https://imgbbb.com/images/2019/05/28/snow.th.jpg'
-                    });
-                    client.reply(token, {
-                        type: 'text',
-                        text:`Bruh It\'s cold out there. The temperature right now is ${temp} °C`
-                    })
+                    client.reply(token, [
+                        line.createImage({
+                            originalContentUrl: 'https://imgbbb.com/images/2019/05/28/snow.jpg',
+                            previewImageUrl: 'https://imgbbb.com/images/2019/05/28/snow.th.jpg'
+                        }),
+                        line.createText(`Bruh It\'s cold out there. The temperature right now is ${temp} °C`)
+                    ]);
                 }
                 if (climate === 'Clear') {
-                    client.replyImage(token, {
-                        originalContentUrl: 'https://imgbbb.com/images/2019/05/28/sunny.jpg',
-                        previewImageUrl: 'https://imgbbb.com/images/2019/05/28/sunny.th.jpg'
-                    });
-                    client.reply(token, {
-                        type: 'text',
-                        text:`Yeah! very sunny today. The temperature right now is ${temp} °C`
-                    })
+                    client.reply(token, [
+                        line.createImage({
+                            originalContentUrl: 'https://imgbbb.com/images/2019/05/28/sunny.jpg',
+                            previewImageUrl: 'https://imgbbb.com/images/2019/05/28/sunny.th.jpg'
+                        }),
+                        line.createText(`Yeah! very sunny today. The temperature right now is ${temp} °C`)
+                    ]);
                 }
             });
             // console.log(event)
