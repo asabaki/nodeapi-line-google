@@ -99,7 +99,7 @@ exports.replyNow = (req, res, next) => {
     //
     // }
     console.log('Type: ', event.type);
-    if (event.type === 'message') {
+    if (event.message.type === 'text') {
         client.replyCarouselTemplate(token, 'Forecast', [
             {
                 thumbnailImageUrl: 'https://images.unsplash.com/photo-1545259742-b4fd8fea67e4?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1650&q=80',
