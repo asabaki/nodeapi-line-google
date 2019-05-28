@@ -39,14 +39,6 @@ exports.SCG = (req, res, next) => {
     request(options, (err, response, body) => {
         res.json(JSON.parse(body));
     })
-    // fetch(`https://api.stormglass.io/v1/weather/point?lat=${lat}&lng=${lng}&params=${params}`, {
-    //     headers: {
-    //         'Authorization': '97711870-8166-11e9-acc1-0242ac130004-97711960-8166-11e9-acc1-0242ac130004'
-    //     }
-    // }).then((response) => response.json()).then((jsonData) => {
-    //     // Do something with response data.
-    //     res.json(jsonData);
-    // });
 };
 
 exports.XYZ = (req, res, next) => {
@@ -102,51 +94,128 @@ exports.replyNow = (req, res, next) => {
     console.log(req.body.events);
     const token = req.body.events[0].replyToken;
     const event = req.body.events[0];
-    if (event.type === 'postback') {
-        const action = event.postback.data;
-
-    }
+    // if (event.type === 'postback') {
+    //     const action = event.postback.data;
+    //
+    // }
     if (event.type === 'location') {
         const lat = event.message.latitude;
         const lon = event.message.longitude;
+        const options = {
+            url: `https://api.openweathermap.org/data/2.5/weather`,
+            qs: {
+                APPID: '50e72c3fdbf1a59902613f027a11a64c',
+                lon,
+                lat,
+                units: 'metric'
+            }
+        };
+        request(options, (err, response, body) => {
+            const body_json = JSON.parse(body);
+            const climate = body_json.weather[0].main;
+            const temp = body_json.main.temp;
+            if (climate === 'Thunderstorm') {
+                client.replyImage(token, {
+                    originalContentUrl: 'https://imgbbb.com/images/2019/05/28/thunder.jpg',
+                    previewImageUrl: 'https://imgbbb.com/images/2019/05/28/thunder.th.jpg'
+                });
+                client.reply(token, {
+                    type: 'text',
+                    text:`Whoa, It seems that there is a thunderstorm out there. The temperature right now is ${temp} °C`
+                })
+            }
+            if (climate === 'Clouds') {
+                client.replyImage(token, {
+                    originalContentUrl: 'https://imgbbb.com/images/2019/05/28/cloudy.jpg',
+                    previewImageUrl: 'https://imgbbb.com/images/2019/05/28/cloudy.th.jpg'
+                });
+                client.reply(token, {
+                    type: 'text',
+                    text:`Hmmm, Quite Cloudy today. The temperature right now is ${temp} °C`
+                })
+            }
+            if (climate === 'Drizzle') {
+                client.replyImage(token, {
+                    originalContentUrl: 'https://imgbbb.com/images/2019/05/28/drizzle.jpg',
+                    previewImageUrl: 'https://imgbbb.com/images/2019/05/28/drizzle.th.jpg'
+                });
+                client.reply(token, {
+                    type: 'text',
+                    text:`Drizzling today huh? The temperature right now is ${temp} °C`
+                })
+            }
+            if (climate === 'Rain') {
+                client.replyImage(token, {
+                    originalContentUrl: 'https://imgbbb.com/images/2019/05/28/rain.jpg',
+                    previewImageUrl: 'https://imgbbb.com/images/2019/05/28/rain.th.jpg'
+                });
+                client.reply(token, {
+                    type: 'text',
+                    text:`Don\'t get wet today ain\'t you?. The temperature right now is ${temp} °C`
+                })
+            }
+            if (climate === 'Snow') {
+                client.replyImage(token, {
+                    originalContentUrl: 'https://imgbbb.com/images/2019/05/28/snow.jpg',
+                    previewImageUrl: 'https://imgbbb.com/images/2019/05/28/snow.th.jpg'
+                });
+                client.reply(token, {
+                    type: 'text',
+                    text:`Bruh It\'s cold out there. The temperature right now is ${temp} °C`
+                })
+            }
+            if (climate === 'Clear') {
+                client.replyImage(token, {
+                    originalContentUrl: 'https://imgbbb.com/images/2019/05/28/sunny.jpg',
+                    previewImageUrl: 'https://imgbbb.com/images/2019/05/28/sunny.th.jpg'
+                });
+                client.reply(token, {
+                    type: 'text',
+                    text:`Yeah! very sunny today. The temperature right now is ${temp} °C`
+                })
+            }
+            res.json(JSON.parse(body));
+        });
         console.log(event)
+    } else {
+        client.replyCarouselTemplate(token, 'Forecast', [
+            {
+                thumbnailImageUrl: 'https://images.unsplash.com/photo-1545259742-b4fd8fea67e4?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1650&q=80',
+                title: 'Weather Forecast',
+                text: 'Air temperature forecast',
+                actions: [
+                    {
+                        type: 'location',
+                        label: 'Let\'s Forecast',
+                    },
+                ],
+            },
+            // {
+            //     thumbnailImageUrl: 'https://images.unsplash.com/photo-1509803874385-db7c23652552?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1650&q=80',
+            //     title: 'Cloud Coverage',
+            //     text: 'Cloud Coverage Forecast',
+            //     actions: [
+            //         {
+            //             type: 'location',
+            //             label: 'Let\'s Forecast',
+            //         },
+            //     ],
+            // },
+            // {
+            //     thumbnailImageUrl: 'https://images.unsplash.com/photo-1495584816685-4bdbf1b5057e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1567&q=80',
+            //     title: 'Humidity',
+            //     text: 'Humidity Forecast',
+            //     actions: [
+            //         {
+            //             type: 'location',
+            //             label: 'Let\'s Forecast',
+            //             data: 'action=humid'
+            //         }
+            //     ],
+            // },
+        ]);
     }
-    client.replyCarouselTemplate(token, 'Forecast', [
-        {
-            thumbnailImageUrl: 'https://images.unsplash.com/photo-1545259742-b4fd8fea67e4?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1650&q=80',
-            title: 'Air Temperature',
-            text: 'Air temperature forecast',
-            actions: [
-                {
-                    type: 'location',
-                    label: 'Let\'s Forecast',
-                },
-            ],
-        },
-        {
-            thumbnailImageUrl: 'https://images.unsplash.com/photo-1509803874385-db7c23652552?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1650&q=80',
-            title: 'Cloud Coverage',
-            text: 'Cloud Coverage Forecast',
-            actions: [
-                {
-                    type: 'location',
-                    label: 'Let\'s Forecast',
-                },
-            ],
-        },
-        {
-            thumbnailImageUrl: 'https://images.unsplash.com/photo-1495584816685-4bdbf1b5057e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1567&q=80',
-            title: 'Humidity',
-            text: 'Humidity Forecast',
-            actions: [
-                {
-                    type: 'location',
-                    label: 'Let\'s Forecast',
-                    data: 'action=humid'
-                }
-            ],
-        },
-    ]);
+
 
     res.sendStatus(200);
 };
