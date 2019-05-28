@@ -91,14 +91,14 @@ exports.restaurant_find = async (req, res, next) => {
 };
 
 exports.replyNow = (req, res, next) => {
-    console.log(req.body.events);
+    // console.log(req.body.events);
     const token = req.body.events[0].replyToken;
     const event = req.body.events[0];
     // if (event.type === 'postback') {
     //     const action = event.postback.data;
     //
     // }
-    console.log('Type: ', event.type);
+    console.log('Type: ', event.message.type);
     if (event.message.type === 'text') {
         client.replyCarouselTemplate(token, 'Forecast', [
             {
@@ -213,9 +213,8 @@ exports.replyNow = (req, res, next) => {
                         text:`Yeah! very sunny today. The temperature right now is ${temp} °C`
                     })
                 }
-                res.json(JSON.parse(body));
             });
-            console.log(event)
+            // console.log(event)
         }
     }
 
