@@ -6,6 +6,7 @@ const config = {
     channelAccessToken: keys.channelAccessToken,
     channelSecret: keys.channelSecret
 };
+
 const client = new line.Client(config);
 
 module.exports = app => {
@@ -23,7 +24,7 @@ module.exports = app => {
     // app.post('/echo', line.middleware(config), controller.echo);
     app.post('/replyYourself', controller.replyNow);
 
-    app.post('/replyWithMid', line.middleware(config), controller.replyNow);
+    app.post('/replyWithMid', line.middleware(config), controller.replyWithMid);
 
     app.post('/webhook', controller.webhook);
 

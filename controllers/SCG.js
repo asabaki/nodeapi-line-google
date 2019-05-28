@@ -4,12 +4,12 @@ const googleMapsClient = require('@google/maps').createClient({
     key: keys.googleApi,
     Promise: Promise
 });
-// const line = require('@line/bot-sdk');
-// const config = {
-//     channelAccessToken: keys.channelAccessToken,
-//     channelSecret: keys.channelSecret
-// };
-// const client = new line.Client(config);
+const line = require('@line/bot-sdk');
+const config = {
+    channelAccessToken: keys.channelAccessToken,
+    channelSecret: keys.channelSecret
+};
+const client_main = new line.Client(config);
 
 const { LineClient } = require('messaging-api-line');
 
@@ -91,30 +91,15 @@ exports.replyNow = (req,res,next) => {
     res.sendStatus(200);
 };
 
-exports.webhook = (req,res,next) => {
-    let reply_token = req.body.events[0].replyToken;
-    let msg = req.body.events[0].message.text;
-    reply(reply_token, msg);
-    res.sendStatus(200)
+
+exports.replyWithMid = (req,res,next) => {
+    const token = req.body.events[0].replyToken;
+    const msg = req.body.events[0].message.text;
+    console.log(token);
+    console.log(msg);
+    client_main.replyMessage(token, 'Hello Yourself, Bitch!!').then((res) => {
+        console.log(res);
+        res.statusCode(200);
+    })
 };
 
-function reply(reply_token, msg) {
-    let headers = {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer {xxxxxxx}'
-    };
-    let body = JSON.stringify({
-        replyToken: reply_token,
-        messages: [{
-            type: 'text',
-            text: msg
-        }]
-    });
-    request.post({
-        url: 'https://api.line.me/v2/bot/message/reply',
-        headers: headers,
-        body: body
-    }, (err, res, body) => {
-        console.log('status = ' + res.statusCode);
-    });
-}
