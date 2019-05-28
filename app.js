@@ -27,7 +27,7 @@ mongoose.Promise = global.Promise;
 mongoose.connect(keys.mongoUri, {useNewUrlParser: true, useCreateIndex: true,});
 
 
-app.use(middleware(config));
+// app.use(middleware(config));
 app.use(bodyParser.json());
 app.use(
     cookieSession({
