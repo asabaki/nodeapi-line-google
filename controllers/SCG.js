@@ -141,15 +141,9 @@ exports.replyNow = (req, res, next) => {
             actions: [
                 {
                     type: 'location',
-                    label: 'Let\'s Forecast'
-                },
-                {
-                    type: 'postback',
-                    data: 'action=humid',
-                    label: 'Let\'s Forecast'
-                },
-
-
+                    label: 'Let\'s Forecast',
+                    data: 'action=humid'
+                }
             ],
         },
     ]);
