@@ -2,13 +2,13 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cookieSession = require('cookie-session');
 const passport = require('passport');
-// const middleware = require('@line/bot-sdk').middleware;
+const middleware = require('@line/bot-sdk').middleware;
 const bodyParser = require('body-parser');
 const keys = require('./config/keys');
-// const config = {
-//     channelAccessToken: keys.channelAccessToken,
-//     channelSecret: keys.channelSecret
-// };
+const config = {
+    channelAccessToken: keys.channelAccessToken,
+    channelSecret: keys.channelSecret
+};
 const path = require('path');
 const logger = require('morgan');
 const app = express();
@@ -27,8 +27,8 @@ mongoose.Promise = global.Promise;
 mongoose.connect(keys.mongoUri, {useNewUrlParser: true, useCreateIndex: true,});
 
 
-// app.use(middleware(config));
-app.use(bodyParser.json());
+app.use(middleware(config));
+// app.use(bodyParser.json());
 app.use(
     cookieSession({
         maxAge: 30 * 24 * 60 * 60 * 1000,

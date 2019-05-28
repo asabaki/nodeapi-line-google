@@ -23,10 +23,10 @@ module.exports = app => {
 
     // app.post('/echo', line.middleware(config), controller.echo);
     app.post('/replyYourself', controller.replyNow);
-
+    //
     app.post('/replyWithMid', line.middleware(config), controller.replyWithMid);
 
-    app.post('/webhook', controller.webhook);
+    // app.post('/webhook', controller.webhook);
 
     // app.post('/callback', line.middleware(config), (req,res) => {
     //     Promise
