@@ -12,7 +12,7 @@ const config = {
 };
 const client_main = new line.Client(config);
 
-const {LineClient} = require('messaging-api-line');
+const {LineClient, Line} = require('messaging-api-line');
 
 // get accessToken and channelSecret from LINE developers website
 const client = LineClient.connect({
@@ -157,56 +157,56 @@ exports.replyNow = (req, res, next) => {
 
                 if (climate === 'Thunderstorm') {
                     client.reply(token, [
-                        LineClient.createImage({
+                        Line.createImage({
                             originalContentUrl: 'https://imgbbb.com/images/2019/05/28/thunder.jpg',
                             previewImageUrl: 'https://imgbbb.com/images/2019/05/28/thunder.th.jpg'
                         }),
-                        LineClient.createText(`\`Whoa, It seems that there is a thunderstorm out there. The temperature right now is ${temp} °C\``)
+                        Line.createText(`\`Whoa, It seems that there is a thunderstorm out there. The temperature right now is ${temp} °C\``)
                     ])
                 }
                 if (climate === 'Clouds') {
                     client.reply(token, [
-                        LineClient.createImage({
+                        Line.createImage({
                             originalContentUrl: 'https://imgbbb.com/images/2019/05/28/cloudy.jpg',
                             previewImageUrl: 'https://imgbbb.com/images/2019/05/28/cloudy.th.jpg'
                         }),
-                        LineClient.createText(`Hmmm, Quite Cloudy today. The temperature right now is ${temp} °C`)
+                        Line.createText(`Hmmm, Quite Cloudy today. The temperature right now is ${temp} °C`)
                     ]);
                 }
                 if (climate === 'Drizzle') {
                     client.reply(token, [
-                        LineClient.createImage({
+                        Line.createImage({
                             originalContentUrl: 'https://imgbbb.com/images/2019/05/28/drizzle.jpg',
                             previewImageUrl: 'https://imgbbb.com/images/2019/05/28/drizzle.th.jpg'
                         }),
-                        LineClient.createText(`Drizzling today huh? The temperature right now is ${temp} °C`)
+                        Line.createText(`Drizzling today huh? The temperature right now is ${temp} °C`)
                     ]);
                 }
                 if (climate === 'Rain') {
                     client.reply(token, [
-                        LineClient.createImage({
+                        Line.createImage({
                             originalContentUrl: 'https://imgbbb.com/images/2019/05/28/rain.jpg',
                             previewImageUrl: 'https://imgbbb.com/images/2019/05/28/rain.th.jpg'
                         }),
-                        LineClient.createText(`Don\'t get wet today ain\'t you?. The temperature right now is ${temp} °C`)
+                        Line.createText(`Don\'t get wet today ain\'t you?. The temperature right now is ${temp} °C`)
                     ]);
                 }
                 if (climate === 'Snow') {
                     client.reply(token, [
-                        LineClient.createImage({
+                        Line.createImage({
                             originalContentUrl: 'https://imgbbb.com/images/2019/05/28/snow.jpg',
                             previewImageUrl: 'https://imgbbb.com/images/2019/05/28/snow.th.jpg'
                         }),
-                        LineClient.createText(`Bruh It\'s cold out there. The temperature right now is ${temp} °C`)
+                        Line.createText(`Bruh It\'s cold out there. The temperature right now is ${temp} °C`)
                     ]);
                 }
                 if (climate === 'Clear') {
                     client.reply(token, [
-                        LineClient.createImage({
+                        Line.createImage({
                             originalContentUrl: 'https://imgbbb.com/images/2019/05/28/sunny.jpg',
                             previewImageUrl: 'https://imgbbb.com/images/2019/05/28/sunny.th.jpg'
                         }),
-                        LineClient.createText(`Yeah! very sunny today. The temperature right now is ${temp} °C`)
+                        Line.createText(`Yeah! very sunny today. The temperature right now is ${temp} °C`)
                     ]);
                 }
             });
