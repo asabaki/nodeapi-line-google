@@ -1,5 +1,6 @@
 const keys = require('../config/keys');
-const request = require('request')
+const request = require('request');
+// const fetch = require('node-fetch');
 const googleMapsClient = require('@google/maps').createClient({
     key: keys.googleApi,
     Promise: Promise
@@ -22,9 +23,31 @@ const client = LineClient.connect({
 
 
 exports.SCG = (req, res, next) => {
-    res.json({
-        message: 'No Raining Today'
+    const lat = 13.975851;
+    const lng = 99.637320;
+    const params = 'airTemperature';
+    const now = Date.now();
+    const options = {
+        url: `https://api.openweathermap.org/data/2.5/weather`,
+        qs: {
+            APPID: '50e72c3fdbf1a59902613f027a11a64c',
+            lon: lng,
+            lat,
+            units: 'metric'
+        }
+    };
+
+    request(options, (err,response,body) => {
+        res.json(JSON.parse(body));
     })
+    // fetch(`https://api.stormglass.io/v1/weather/point?lat=${lat}&lng=${lng}&params=${params}`, {
+    //     headers: {
+    //         'Authorization': '97711870-8166-11e9-acc1-0242ac130004-97711960-8166-11e9-acc1-0242ac130004'
+    //     }
+    // }).then((response) => response.json()).then((jsonData) => {
+    //     // Do something with response data.
+    //     res.json(jsonData);
+    // });
 };
 
 exports.XYZ = (req, res, next) => {
@@ -79,53 +102,65 @@ exports.restaurant_find = async (req, res, next) => {
 exports.replyNow = (req,res,next) => {
     console.log(req.body.events);
     const token = req.body.events[0].replyToken;
-    const msg = req.body.events[0].message.text;
-    console.log(token);
-    console.log(msg);
-    // client.reply(token, [{
-    //     type: 'text',
-    //     text: 'Hello yourself'
-    // }, {
-    //     type: 'text',
-    //     text: 'Fucker'
-    // }]);
-    client.replyButtonTemplate(token, 'this is a template', {
-        thumbnailImageUrl: 'https://images.unsplash.com/photo-1558058739-d57e30ecea50?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=668&q=80',
-        title: 'Menu',
-        text: 'Please select',
-        actions: [
-            {
-                type: 'postback',
-                label: 'Buy',
-                data: 'action=buy&itemid=123',
-            },
-            {
-                type: 'postback',
-                label: 'Add to cart',
-                data: 'action=add&itemid=123',
-            },
-            {
-                type: 'uri',
-                label: 'View detail',
-                uri: 'http://example.com/page/123',
-            },
-        ],
-    });
+    const event = req.body.events[0];
+    if (event.type === 'postback') {
+        const action = event.postback.data;
 
+    }
+    if (event.type === 'location') {
+        console.log(event)
+    }
+    client.replyCarouselTemplate(token, 'Forecast', [
+        {
+            thumbnailImageUrl: 'https://images.unsplash.com/photo-1545259742-b4fd8fea67e4?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1650&q=80',
+            title: 'Air Temperature',
+            text: 'Air temperature forecast',
+            actions: [
+                {
+                    type: 'postback',
+                    label: 'Let\'s Forecast',
+                    data: 'action=temp',
+                },
+            ],
+        },
+        {
+            thumbnailImageUrl: 'https://images.unsplash.com/photo-1509803874385-db7c23652552?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1650&q=80',
+            title: 'Cloud Coverage',
+            text: 'Cloud Coverage Forecast',
+            actions: [
+                {
+                    type: 'postback',
+                    label: 'Let\'s Forecast',
+                    data: 'action=cloud',
+                },
+            ],
+        },
+        {
+            thumbnailImageUrl: 'https://images.unsplash.com/photo-1495584816685-4bdbf1b5057e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1567&q=80',
+            title: 'Humidity',
+            text: 'Humidity Forecast',
+            actions: [
+                {
+                    type: 'postback',
+                    label: 'Let\'s Forecast',
+                    data: 'action=humid',
+                },
+
+
+            ],
+        },
+    ]);
 
     res.sendStatus(200);
 };
 
 
-// exports.replyWithMid = (req,res,next) => {
-//     const token = req.body.events[0].replyToken;
-//     const msg = req.body.events[0].message.text;
-//     console.log(token);
-//     console.log(msg);
-//     client_main.replyMessage(token, 'Hello Yourself, Bitch!!')
-//         .then(() => {
-//         console.log('Sending....');
-//         res.statusCode(200);
-//     })
-// };
+/*
 
+ [ { type: 'postback',
+replyToken: '70b5d6bb75cf4c848f36ff4126c4e6bb',
+ source:{ userId: 'Ub2a382c3beb331da459b1426710681f6', type: 'user' },
+timestamp: 1559060923971,
+ postback: { data: 'action=buy&itemid=123' } } ]
+
+ */
