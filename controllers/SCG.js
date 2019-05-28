@@ -18,7 +18,7 @@ exports.SCG = (req, res, next) => {
         message: 'No Raining Today'
     })
 };
-
+// TODO - Add npm request and study architecture of LINE Api again
 exports.XYZ = (req, res, next) => {
     /*
     ------ Write a function to find X,Y,Z from series 3,5,9,15,X,Y,Z -----
