@@ -23,8 +23,8 @@ const client = LineClient.connect({
 
 
 exports.SCG = (req, res, next) => {
-    const lat = 13.975851;
-    const lng = 99.637320;
+    const lat = 17.970520953781532;
+    const lng = 99.65409406377026;
     const params = 'airTemperature';
     const now = Date.now();
     const options = {
@@ -108,6 +108,8 @@ exports.replyNow = (req,res,next) => {
 
     }
     if (event.type === 'location') {
+        const lat = event.message.latitude;
+        const lon = event.message.longitude;
         console.log(event)
     }
     client.replyCarouselTemplate(token, 'Forecast', [
@@ -128,9 +130,8 @@ exports.replyNow = (req,res,next) => {
             text: 'Cloud Coverage Forecast',
             actions: [
                 {
-                    type: 'postback',
+                    type: 'location',
                     label: 'Let\'s Forecast',
-                    data: 'action=cloud',
                 },
             ],
         },
@@ -140,8 +141,11 @@ exports.replyNow = (req,res,next) => {
             text: 'Humidity Forecast',
             actions: [
                 {
+                  type: 'location',
+                  label: 'Let\'s Forecast'
+                },
+                {
                     type: 'postback',
-                    label: 'Let\'s Forecast',
                     data: 'action=humid',
                 },
 
