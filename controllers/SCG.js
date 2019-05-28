@@ -81,10 +81,13 @@ exports.replyNow = (req,res,next) => {
     const msg = req.body.events[0].message.text;
     console.log(token);
     console.log(msg);
-    client.reply(token, {
+    client.reply(token, [{
         type: 'text',
         text: 'Hello yourself'
-    });
+    }, {
+        type: 'text',
+        text: 'Fucker'
+    }]);
     res.sendStatus(200);
 };
 
