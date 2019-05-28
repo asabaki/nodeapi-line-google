@@ -146,7 +146,7 @@ exports.replyNow = (req, res, next) => {
                 {
                     type: 'postback',
                     data: 'action=humid',
-                    abel: 'Let\'s Forecast'
+                    label: 'Let\'s Forecast'
                 },
 
 
