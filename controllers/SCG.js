@@ -97,10 +97,10 @@ exports.replyWithMid = (req,res,next) => {
     const msg = req.body.events[0].message.text;
     console.log(token);
     console.log(msg);
-    // client_main.replyMessage(token, 'Hello Yourself, Bitch!!')
-    //     .then(() => {
-    //     console.log('Sending....');
-    //     res.statusCode(200);
-    // })
+    client_main.replyMessage(token, 'Hello Yourself, Bitch!!')
+        .then(() => {
+        console.log('Sending....');
+        res.statusCode(200);
+    })
 };
 

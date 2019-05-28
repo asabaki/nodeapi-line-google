@@ -6,16 +6,22 @@ const config = {
     channelAccessToken: keys.channelAccessToken,
     channelSecret: keys.channelSecret
 };
-
+const middlewareConfig = {
+    channelSecret: keys.channelSecret
+};
 const client = new line.Client(config);
-
+const somemiddleware = (req, res, next) => {
+    console.log(req.body);
+    console.log(req.headers);
+    next();
+};
 module.exports = app => {
 
-    app.get('/', (req,res) => {
+    app.get('/', (req, res) => {
         res.json('So far so good');
     });
 
-    app.get('/scg', controller.SCG);
+    app.get('/scg', somemiddleware, controller.SCG);
 
     app.get('/xyz', controller.XYZ);
 
@@ -24,7 +30,7 @@ module.exports = app => {
     // app.post('/echo', line.middleware(config), controller.echo);
     app.post('/replyYourself', controller.replyNow);
     //
-    app.post('/replyWithMid', line.middleware(config), controller.replyWithMid);
+    app.post('/replyWithMid',somemiddleware, line.middleware(middlewareConfig), controller.replyWithMid);
 
     // app.post('/webhook', controller.webhook);
 
