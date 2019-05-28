@@ -4,12 +4,20 @@ const googleMapsClient = require('@google/maps').createClient({
     key: keys.googleApi,
     Promise: Promise
 });
-const line = require('@line/bot-sdk');
-const config = {
-    channelAccessToken: keys.channelAccessToken,
-    channelSecret: keys.channelSecret
-};
-const client = new line.Client(config);
+// const line = require('@line/bot-sdk');
+// const config = {
+//     channelAccessToken: keys.channelAccessToken,
+//     channelSecret: keys.channelSecret
+// };
+// const client = new line.Client(config);
+
+const { LineClient } = require('messaging-api-line');
+
+// get accessToken and channelSecret from LINE developers website
+const client = LineClient.connect({
+    accessToken: keys.channelAccessToken,
+    channelSecret: keys.channelSecret,
+});
 
 
 
@@ -18,7 +26,7 @@ exports.SCG = (req, res, next) => {
         message: 'No Raining Today'
     })
 };
-// TODO - Add npm request and study architecture of LINE Api again
+
 exports.XYZ = (req, res, next) => {
     /*
     ------ Write a function to find X,Y,Z from series 3,5,9,15,X,Y,Z -----
@@ -68,6 +76,18 @@ exports.restaurant_find = async (req, res, next) => {
 
 };
 
+exports.replyNow = (req,res,next) => {
+    const token = req.body.events[0].replyToken;
+    const msg = req.body.events[0].message.text;
+    console.log(token);
+    console.log(msg);
+    client.reply(token, {
+        type: 'text',
+        text: 'Hello yourself'
+    });
+    res.sendStatus(200);
+};
+
 exports.webhook = (req,res,next) => {
     let reply_token = req.body.events[0].replyToken;
     let msg = req.body.events[0].message.text;
@@ -95,26 +115,3 @@ function reply(reply_token, msg) {
         console.log('status = ' + res.statusCode);
     });
 }
-
-// exports.echo = (req,res,next) => {
-//     Promise
-//         .all(req.body.events.map(handleEvent))
-//         .then((result) => res.json(result))
-//         .catch((err) => {
-//             console.error(err);
-//             res.status(500).end();
-//         });
-// };
-//
-// function handleEvent(event) {
-//     if (event.type !== 'message' || event.message.type !== 'text') {
-//         // ignore non-text-message event
-//         return Promise.resolve(null);
-//     }
-//
-//     // create a echoing text message
-//     const echo = { type: 'text', text: event.message.text };
-//
-//     // use reply API
-//     return client.replyMessage(event.replyToken, echo);
-// }
