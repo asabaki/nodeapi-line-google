@@ -117,9 +117,8 @@ exports.replyNow = (req,res,next) => {
             text: 'Air temperature forecast',
             actions: [
                 {
-                    type: 'postback',
+                    type: 'location',
                     label: 'Let\'s Forecast',
-                    data: 'action=temp',
                 },
             ],
         },
