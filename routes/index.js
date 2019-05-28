@@ -20,7 +20,7 @@ module.exports = app => {
 
     app.get('/restaurant', controller.restaurant_find);
 
-    app.post('/echo', line.middleware(config), controller.echo);
+    // app.post('/echo', line.middleware(config), controller.echo);
 
     app.post('/webhook', controller.webhook);
 
