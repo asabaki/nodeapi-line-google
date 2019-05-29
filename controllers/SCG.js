@@ -150,16 +150,19 @@ exports.replyNow = async (req, res, next) => {
                                 location: event.message.address
                             }
                         });
+                    console.log(addLocation);
                 } catch (e) {
                     console.log(e);
                     res.sendStatus(400);
                 }
             } else {
                 try {
-                    const new_User = await User.save({
+                    const userObj = new User({
                         line_id: userId,
                         location: event.message.address
                     });
+                    const new_User = await userObj.save();
+                    console.log(new_User);
                 } catch (e) {
                     console.log(e);
                     res.sendStatus(400);
