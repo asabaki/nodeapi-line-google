@@ -19,7 +19,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-// require('./models/User');
+require('./models/User');
 // require('./models/Blog');
 // require('./services/passport');
 // require('./services/cache');
