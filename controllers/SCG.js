@@ -99,6 +99,7 @@ exports.replyNow = (req, res, next) => {
     //
     // }
     console.log('Type: ', event.message.type);
+    console.log(event);
     if (event.message.type === 'text') {
         client.replyCarouselTemplate(token, 'Forecast', [
             {
