@@ -186,7 +186,9 @@ exports.replyNow = async (req, res, next) => {
             }
             // Check Cache existence
             let climate,temp;
-            const forecast_result = await redis_client.hget(JSON.stringify(event.source.userId),JSON.stringify(event.message.address));
+            console.log(typeof event.source.userId + ' ' + event.source.userId);
+            console.log(typeof event.message.address + ' ' + event.message.address);
+            const forecast_result = await redis_client.hget(event.source.userId,event.message.address);
             if (forecast_result) {
                 console.log('Serving from Cache');
                 const json_forecast = JSON.parse(forecast_result);
