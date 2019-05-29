@@ -3,5 +3,6 @@ module.exports = {
     cookieKey: process.env.cookieKey,
     googleApi: process.env.googleApi,
     channelAccessToken: process.env.channelAccessToken,
-    channelSecret: process.env.channelSecret
+    channelSecret: process.env.channelSecret,
+    redisUrl: process.env.REDIS_URL
 };
