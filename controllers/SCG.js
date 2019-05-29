@@ -162,12 +162,17 @@ exports.replyNow = async (req, res, next) => {
         {
             if (user) {
                 try {
-                    const addLocation = await User.findOneAndUpdate({line_id: userId},
-                        {
-                            $push: {
-                                location: event.message.address
-                            }
-                        });
+                    // if user exists then add on location
+                    const existed_user = await User.findOne({line_id: userId});
+                    if (!existed_user.location.includes(String(event.message.address))) {
+                        const addLocation = await User.findOneAndUpdate({line_id: userId},
+                            {
+                                $push: {
+                                    location: event.message.address
+                                }
+                            });
+                    }
+
                 } catch (e) {
                     console.log(e);
                     res.sendStatus(400);
@@ -185,16 +190,15 @@ exports.replyNow = async (req, res, next) => {
                 }
             }
             // Check Cache existence
-            let climate,temp;
-            console.log(typeof event.source.userId + ' ' + event.source.userId);
-            console.log(typeof event.message.address + ' ' + event.message.address);
-            const forecast_result = await redis_client.hget(event.source.userId,event.message.address);
+            let climate, temp;
+
+            const forecast_result = await redis_client.hget(event.source.userId, event.message.address);
             if (forecast_result) {
                 console.log('Serving from Cache');
                 const json_forecast = JSON.parse(forecast_result);
                 climate = json_forecast.weather[0].main;
                 temp = json_forecast.main.temp;
-                replyLine_helper(climate,token,temp);
+                replyLine_helper(climate, token, temp);
 
             } else {
                 // Fetch forecast detail
@@ -211,16 +215,14 @@ exports.replyNow = async (req, res, next) => {
                 };
                 request(options, (err, response, body) => {
                     const body_json = JSON.parse(body);
-                    redis_client.hset(event.source.userId,event.message.address,JSON.stringify(body_json), 'EX', 10);
+                    redis_client.hset(event.source.userId, event.message.address, JSON.stringify(body_json), 'EX', 10);
                     climate = body_json.weather[0].main;
                     temp = body_json.main.temp;
-                    replyLine_helper(climate,token,temp);
+                    replyLine_helper(climate, token, temp);
 
                 });
             }
 
-
-            // console.log(event)
         }
     }
 
@@ -234,8 +236,7 @@ exports.testCache = async (req, res, next) => {
 };
 
 
-
-function replyLine_helper (climate,token,temp) {
+function replyLine_helper(climate, token, temp) {
     if (climate === 'Thunderstorm') {
         client.reply(token, [
             Line.createImage({
@@ -291,12 +292,3 @@ function replyLine_helper (climate,token,temp) {
         ]);
     }
 }
-/*
-
- [ { type: 'postback',
-replyToken: '70b5d6bb75cf4c848f36ff4126c4e6bb',
- source:{ userId: 'Ub2a382c3beb331da459b1426710681f6', type: 'user' },
-timestamp: 1559060923971,
- postback: { data: 'action=buy&itemid=123' } } ]
-
- */
