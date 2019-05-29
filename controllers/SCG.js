@@ -1,5 +1,6 @@
 const keys = require('../config/keys');
 const request = require('request');
+const User = require('../models/user_line');
 // const fetch = require('node-fetch');
 const googleMapsClient = require('@google/maps').createClient({
     key: keys.googleApi,
@@ -90,16 +91,16 @@ exports.restaurant_find = async (req, res, next) => {
 
 };
 
-exports.replyNow = (req, res, next) => {
-    // console.log(req.body.events);
+exports.replyNow = async (req, res, next) => {
     const token = req.body.events[0].replyToken;
     const event = req.body.events[0];
-    // if (event.type === 'postback') {
-    //     const action = event.postback.data;
-    //
-    // }
+    // Get user id from req
+    const userId = event.source.userId;
     console.log('Type: ', event.message.type);
     console.log(event);
+    // Check if user is exist
+    const user = await User.findOne({line_id: userId});
+
     if (event.message.type === 'text') {
         client.replyCarouselTemplate(token, 'Forecast', [
             {
@@ -137,8 +138,33 @@ exports.replyNow = (req, res, next) => {
             //     ],
             // },
         ]);
-    } else {
+    }
+    else {
         {
+            if (user) {
+                try {
+                    const addLocation = await User.findOneAndUpdate({line_id: userId},
+                        {
+                            $push: {
+                                location: event.message.address
+                            }
+                        });
+                } catch (e) {
+                    console.log(e);
+                    res.sendStatus(400);
+                }
+            } else {
+                try {
+                    const new_User = await User.save({
+                        line_id: userId,
+                        location: event.message.address
+                    });
+                } catch (e) {
+                    console.log(e);
+                    res.sendStatus(400);
+                }
+            }
+            // Fetch forecast detail
             const lat = event.message.latitude;
             const lon = event.message.longitude;
             const options = {
