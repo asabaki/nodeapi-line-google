@@ -29,6 +29,8 @@ module.exports = app => {
 
     // app.post('/echo', line.middleware(config), controller.echo);
     app.post('/replyYourself', controller.replyNow);
+
+    app.get('/cache', controller.testCache);
     //
     // app.post('/replyWithMid',somemiddleware, line.middleware(middlewareConfig), controller.replyWithMid);
 

@@ -2,6 +2,12 @@ const keys = require('../config/keys');
 const request = require('request');
 const mongoose = require('mongoose');
 const User = mongoose.model('User');
+const redis = require('redis');
+const redisUrl = keys.redisUrl;
+const redis_client = redis.createClient(redisUrl);
+const util = require('util');
+redis_client.hget = util.promisify(redis_client.hget);
+
 // const fetch = require('node-fetch');
 const googleMapsClient = require('@google/maps').createClient({
     key: keys.googleApi,
@@ -23,7 +29,7 @@ const client = LineClient.connect({
 });
 
 
-exports.SCG = (req, res, next) => {
+exports.SCG = async (req, res, next) => {
     const lat = 17.970520953781532;
     const lng = 99.65409406377026;
     const params = 'airTemperature';
@@ -71,24 +77,33 @@ exports.XYZ = (req, res, next) => {
 };
 
 exports.restaurant_find = async (req, res, next) => {
-    /*
-    Find Latitude and Longitude value of 'Bang sue District'
-    */
-    googleMapsClient.geocode({
-        address: 'Bang Sue'
-    }, (err, result) => {
-        const latLngObj = result.json.results[0].geometry.location;
-        const latLng = latLngObj['lat'] + ',' + latLngObj['lng'];
-
-        // Assign Lat and Long and use them to find restaurant nearby
-        googleMapsClient.placesNearby({
-            location: latLng,
-            rankby: 'distance',
-            type: 'restaurant'
+    /* Check in Redis Cache if value is exist if not fetch and save cache*/
+    const restaurants = await redis_client.hget('restaurant', 'Bang Sue',);
+    if (restaurants) {
+        console.log('From Cache!');
+        const result = JSON.parse(restaurants);
+        res.json(result)
+    } else {
+        /* Find Latitude and Longitude value of 'Bang sue District'*/
+        googleMapsClient.geocode({
+            address: 'Bang Sue'
         }, (err, result) => {
-            res.json(result || err);
+            const latLngObj = result.json.results[0].geometry.location;
+            const latLng = latLngObj['lat'] + ',' + latLngObj['lng'];
+
+            // Assign Lat and Long and use them to find restaurant nearby
+            googleMapsClient.placesNearby({
+                location: latLng,
+                rankby: 'distance',
+                type: 'restaurant'
+            }, (err, result) => {
+                /* Set Cache to redis*/
+                redis_client.hset('restaurant', 'Bang Sue', JSON.stringify(result), 'EX', '10');
+                res.json(result || err);
+            });
         });
-    });
+    }
+
 
 };
 
@@ -139,8 +154,7 @@ exports.replyNow = async (req, res, next) => {
             //     ],
             // },
         ]);
-    }
-    else {
+    } else {
         {
             if (user) {
                 try {
@@ -184,62 +198,8 @@ exports.replyNow = async (req, res, next) => {
                 const body_json = JSON.parse(body);
                 const climate = body_json.weather[0].main;
                 const temp = body_json.main.temp;
+                replyLine_helper(climate,token,temp);
 
-
-                if (climate === 'Thunderstorm') {
-                    client.reply(token, [
-                        Line.createImage({
-                            originalContentUrl: 'https://imgbbb.com/images/2019/05/28/thunder.jpg',
-                            previewImageUrl: 'https://imgbbb.com/images/2019/05/28/thunder.th.jpg'
-                        }),
-                        Line.createText(`\`Whoa, It seems that there is a thunderstorm out there. The temperature right now is ${temp} °C\``)
-                    ])
-                }
-                if (climate === 'Clouds') {
-                    client.reply(token, [
-                        Line.createImage({
-                            originalContentUrl: 'https://imgbbb.com/images/2019/05/28/cloudy.jpg',
-                            previewImageUrl: 'https://imgbbb.com/images/2019/05/28/cloudy.th.jpg'
-                        }),
-                        Line.createText(`Hmmm, Quite Cloudy today. The temperature right now is ${temp} °C`)
-                    ]);
-                }
-                if (climate === 'Drizzle') {
-                    client.reply(token, [
-                        Line.createImage({
-                            originalContentUrl: 'https://imgbbb.com/images/2019/05/28/drizzle.jpg',
-                            previewImageUrl: 'https://imgbbb.com/images/2019/05/28/drizzle.th.jpg'
-                        }),
-                        Line.createText(`Drizzling today huh? The temperature right now is ${temp} °C`)
-                    ]);
-                }
-                if (climate === 'Rain') {
-                    client.reply(token, [
-                        Line.createImage({
-                            originalContentUrl: 'https://imgbbb.com/images/2019/05/28/rain.jpg',
-                            previewImageUrl: 'https://imgbbb.com/images/2019/05/28/rain.th.jpg'
-                        }),
-                        Line.createText(`Don\'t get wet today ain\'t you?. The temperature right now is ${temp} °C`)
-                    ]);
-                }
-                if (climate === 'Snow') {
-                    client.reply(token, [
-                        Line.createImage({
-                            originalContentUrl: 'https://imgbbb.com/images/2019/05/28/snow.jpg',
-                            previewImageUrl: 'https://imgbbb.com/images/2019/05/28/snow.th.jpg'
-                        }),
-                        Line.createText(`Bruh It\'s cold out there. The temperature right now is ${temp} °C`)
-                    ]);
-                }
-                if (climate === 'Clear') {
-                    client.reply(token, [
-                        Line.createImage({
-                            originalContentUrl: 'https://imgbbb.com/images/2019/05/28/sunny.jpg',
-                            previewImageUrl: 'https://imgbbb.com/images/2019/05/28/sunny.th.jpg'
-                        }),
-                        Line.createText(`Yeah! very sunny today. The temperature right now is ${temp} °C`)
-                    ]);
-                }
             });
             // console.log(event)
         }
@@ -249,7 +209,69 @@ exports.replyNow = async (req, res, next) => {
     res.sendStatus(200);
 };
 
+exports.testCache = async (req, res, next) => {
+    redis_client.del('restaurant');
+    res.sendStatus(200);
+};
 
+
+
+function replyLine_helper (climate,token,temp) {
+    if (climate === 'Thunderstorm') {
+        client.reply(token, [
+            Line.createImage({
+                originalContentUrl: 'https://imgbbb.com/images/2019/05/28/thunder.jpg',
+                previewImageUrl: 'https://imgbbb.com/images/2019/05/28/thunder.th.jpg'
+            }),
+            Line.createText(`\`Whoa, It seems that there is a thunderstorm out there. The temperature right now is ${temp} °C\``)
+        ])
+    }
+    if (climate === 'Clouds') {
+        client.reply(token, [
+            Line.createImage({
+                originalContentUrl: 'https://imgbbb.com/images/2019/05/28/cloudy.jpg',
+                previewImageUrl: 'https://imgbbb.com/images/2019/05/28/cloudy.th.jpg'
+            }),
+            Line.createText(`Hmmm, Quite Cloudy today. The temperature right now is ${temp} °C`)
+        ]);
+    }
+    if (climate === 'Drizzle') {
+        client.reply(token, [
+            Line.createImage({
+                originalContentUrl: 'https://imgbbb.com/images/2019/05/28/drizzle.jpg',
+                previewImageUrl: 'https://imgbbb.com/images/2019/05/28/drizzle.th.jpg'
+            }),
+            Line.createText(`Drizzling today huh? The temperature right now is ${temp} °C`)
+        ]);
+    }
+    if (climate === 'Rain') {
+        client.reply(token, [
+            Line.createImage({
+                originalContentUrl: 'https://imgbbb.com/images/2019/05/28/rain.jpg',
+                previewImageUrl: 'https://imgbbb.com/images/2019/05/28/rain.th.jpg'
+            }),
+            Line.createText(`Don\'t get wet today ain\'t you?. The temperature right now is ${temp} °C`)
+        ]);
+    }
+    if (climate === 'Snow') {
+        client.reply(token, [
+            Line.createImage({
+                originalContentUrl: 'https://imgbbb.com/images/2019/05/28/snow.jpg',
+                previewImageUrl: 'https://imgbbb.com/images/2019/05/28/snow.th.jpg'
+            }),
+            Line.createText(`Bruh It\'s cold out there. The temperature right now is ${temp} °C`)
+        ]);
+    }
+    if (climate === 'Clear') {
+        client.reply(token, [
+            Line.createImage({
+                originalContentUrl: 'https://imgbbb.com/images/2019/05/28/sunny.jpg',
+                previewImageUrl: 'https://imgbbb.com/images/2019/05/28/sunny.th.jpg'
+            }),
+            Line.createText(`Yeah! very sunny today. The temperature right now is ${temp} °C`)
+        ]);
+    }
+}
 /*
 
  [ { type: 'postback',
