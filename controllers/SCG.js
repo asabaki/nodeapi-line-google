@@ -1,6 +1,7 @@
 const keys = require('../config/keys');
 const request = require('request');
-const User = require('../models/user_line');
+const mongoose = require('mongoose');
+const User = mongoose.model('User');
 // const fetch = require('node-fetch');
 const googleMapsClient = require('@google/maps').createClient({
     key: keys.googleApi,
