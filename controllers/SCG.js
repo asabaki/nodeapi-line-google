@@ -164,7 +164,6 @@ exports.replyNow = async (req, res, next) => {
                                 location: event.message.address
                             }
                         });
-                    console.log(addLocation);
                 } catch (e) {
                     console.log(e);
                     res.sendStatus(400);
@@ -176,31 +175,45 @@ exports.replyNow = async (req, res, next) => {
                         location: event.message.address
                     });
                     const new_User = await userObj.save();
-                    console.log(new_User);
                 } catch (e) {
                     console.log(e);
                     res.sendStatus(400);
                 }
             }
-            // Fetch forecast detail
-            const lat = event.message.latitude;
-            const lon = event.message.longitude;
-            const options = {
-                url: `https://api.openweathermap.org/data/2.5/weather`,
-                qs: {
-                    APPID: '50e72c3fdbf1a59902613f027a11a64c',
-                    lon,
-                    lat,
-                    units: 'metric'
-                }
-            };
-            request(options, (err, response, body) => {
-                const body_json = JSON.parse(body);
-                const climate = body_json.weather[0].main;
-                const temp = body_json.main.temp;
+            // Check Cache existence
+            let climate,temp;
+            const forecast_result = await redis_client.hget(JSON.stringify(event.source.userId),JSON.stringify(event.message.address));
+            if (forecast_result) {
+                console.log('Serving from Cache');
+                const json_forecast = JSON.parse(forecast_result);
+                climate = json_forecast.weather[0].main;
+                temp = json_forecast.main.temp;
                 replyLine_helper(climate,token,temp);
 
-            });
+            } else {
+                // Fetch forecast detail
+                const lat = event.message.latitude;
+                const lon = event.message.longitude;
+                const options = {
+                    url: `https://api.openweathermap.org/data/2.5/weather`,
+                    qs: {
+                        APPID: '50e72c3fdbf1a59902613f027a11a64c',
+                        lon,
+                        lat,
+                        units: 'metric'
+                    }
+                };
+                request(options, (err, response, body) => {
+                    const body_json = JSON.parse(body);
+                    redis_client.hset(event.source.userId,event.message.address,JSON.stringify(body_json), 'EX', 10);
+                    climate = body_json.weather[0].main;
+                    temp = body_json.main.temp;
+                    replyLine_helper(climate,token,temp);
+
+                });
+            }
+
+
             // console.log(event)
         }
     }
